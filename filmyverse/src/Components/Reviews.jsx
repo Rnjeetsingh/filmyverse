@@ -1,25 +1,32 @@
-import React,{useEffect, useState} from "react";
+import React,{useEffect, useState, useContext} from "react";
 import ReactStars from "react-stars";
 import { reviewsRef, db } from "../firebase/firebase";
 import { addDoc, doc, updateDoc, query, where, getDocs } from 'firebase/firestore'
 import { TailSpin, ThreeDots } from "react-loader-spinner";
-import { async } from "@firebase/util";
-import swal from 'sweetalert'
+// import { async } from "@firebase/util";
+import swal from 'sweetalert';
+import {Appstate} from '../App';
+import { useNavigate } from "react-router-dom";
+
 
 
 const Reviews = ({id,prevRating,userRated}) => {
+const navigate = useNavigate();  
+const useAppstate = useContext(Appstate);
 const [rating,setRating] = useState(0);
 const [loading, setLoading] = useState(false);
 const [reviewsLoading, setReviewsLoading] = useState(false);
 const [form, setForm] = useState("");
 const [data, setData] = useState([]);
+const [newAdded, setNewAdded] = useState(0);
 
 const sendReviews = async () => {
     setLoading(true);
     try {
+      if(useAppstate.login){
         await addDoc(reviewsRef, {
             movieid:id,
-            name: "Ranjeet Singh",
+            name: useAppstate.userName,
             rating: rating,
             thought:form,
             timestamp: new Date().getTime()
@@ -32,6 +39,7 @@ const sendReviews = async () => {
 
         setRating(0);
         setForm("");
+        setNewAdded(newAdded + 1);
 
         swal({
             title: "Review Sent",
@@ -39,6 +47,9 @@ const sendReviews = async () => {
             buttons: false,
             timer: 3000
           })
+        }else{
+          navigate('/login');
+        }
     } catch (error) {
         swal({
             title: error.message,
@@ -53,17 +64,18 @@ const sendReviews = async () => {
 useEffect(() => {
     async function getData() {
         setReviewsLoading(true);
-        let quer = query(reviewsRef, where('movieid', '==', id))
-        const querySnapshot = await getDocs(quer);
+            setData([]);
+            let quer = query(reviewsRef, where('movieid', '==', id))
+            const querySnapshot = await getDocs(quer);
 
-        querySnapshot.forEach((doc) => {
-            setData((prev) => [...prev, doc.data()])
-        })
+            querySnapshot.forEach((doc) => {
+                setData((prev) => [...prev, doc.data()])
+            })
 
-        setReviewsLoading(false);
-    }
+            setReviewsLoading(false);
+        }
     getData();
-},[]);
+},[newAdded]);
 
   return (
     <div className="mt-4 border-t-2 border-gray-700 w-full">

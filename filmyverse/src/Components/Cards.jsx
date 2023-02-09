@@ -28,7 +28,7 @@ const Cards = () => {
         return (
           <Link to={`/detail/${e.id}`}><div key={i} className="card font-medium shadow-lg p-2 hover:-translate-y-3 cursor-pointer mt-6 transition-all duration-500">
             <img className="h-60 md:h-72" src={e.image} />
-            <h1>
+            <h1 className="text-white">
               {e.title}
             </h1>
             <h1 className="flex items-center">
@@ -40,8 +40,8 @@ const Cards = () => {
                 edit={false}
               />
             </h1>
-            <h1>
-              <span className="text-gray-500">Year:</span> {e.year}
+            <h1 >
+              <span className="text-gray-500">Year: </span><span className="text-white">{e.year}</span> 
             </h1>
           </div></Link>
         );
